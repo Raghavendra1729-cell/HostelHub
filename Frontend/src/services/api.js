@@ -1,27 +1,17 @@
 import axios from 'axios';
 
-// API base URL - works for both development and production
-const API_BASE_URL = import.meta.env.PROD 
-  ? '/api'  // In production, use relative path
-  : '/api'; // In development, proxy handles this
-
 // Create axios instance with base configuration
 const api = axios.create({
-    baseURL: API_BASE_URL,
+    baseURL: 'http://localhost:8000/api',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json'
     }
 });
 
-// Request interceptor for debugging
+// Request interceptor for authentication (if needed in future)
 api.interceptors.request.use(
-    (config) => {
-        if (import.meta.env.DEV) {
-            console.log('API Request:', config.method?.toUpperCase(), config.url);
-        }
-        return config;
-    },
+    (config) => config,
     (error) => Promise.reject(error)
 );
 
@@ -30,9 +20,6 @@ api.interceptors.response.use(
     (response) => response,
     (error) => {
         const message = error.response?.data?.message || error.message || 'Something went wrong';
-        if (import.meta.env.DEV) {
-            console.error('API Error:', message);
-        }
         return Promise.reject(new Error(message));
     }
 );
